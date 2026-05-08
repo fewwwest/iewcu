@@ -85,7 +85,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
 .ob-card{width:100%;background:var(--panel);border:1px solid var(--border);
   display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:14px;}
 .ob-desc{color:var(--dim);font-size:13px;line-height:2.2;text-align:center;}
-.ob-irow{width:100%;display:flex;gap:6px;}
+.ob-irow{width:100%;display:flex;gap:6px;align-items:stretch;}
 #obSidInput{
   flex:1;background:var(--bg);border:1px solid var(--border);color:var(--light);
   font-family:'Noto Serif SC',serif;font-size:13px;padding:10px 10px;
@@ -127,7 +127,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
       <div class="ob-irow">
         <input id="obSidInput" type="text" inputmode="numeric" maxlength="11"
           placeholder="11 位学号" autocomplete="off">
-        <button class="btn" style="padding:10px 12px;" onclick="ob1Submit()">→</button>
+        <button class="btn" style="padding:10px 16px;flex-shrink:0;" onclick="ob1Submit()">→</button>
       </div>
       <div id="obErr" class="ob-err">&nbsp;</div>
     </div>
