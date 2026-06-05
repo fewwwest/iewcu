@@ -13,7 +13,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;font-size:13px;
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 12px 48px;}
+  height:100vh;overflow:hidden;}
 .wrap{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;}
 .hdr{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--border);}
 .title{color:var(--light);font-size:17px;letter-spacing:3px;font-weight:500;}
@@ -85,7 +85,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
 .ob-card{width:100%;background:var(--panel);border:1px solid var(--border);
   display:flex;flex-direction:column;align-items:center;padding:20px 16px;gap:14px;}
 .ob-desc{color:var(--dim);font-size:13px;line-height:2.2;text-align:center;}
-.ob-irow{width:100%;display:flex;gap:6px;align-items:stretch;}
+.ob-irow{width:100%;display:flex;gap:6px;}
 #obSidInput{
   flex:1;background:var(--bg);border:1px solid var(--border);color:var(--light);
   font-family:'Noto Serif SC',serif;font-size:13px;padding:10px 10px;
@@ -108,6 +108,54 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
 .sow-hint{color:var(--dim);font-size:12px;letter-spacing:3px;
   animation:hintPulse 1.8s ease-in-out infinite;transition:opacity .3s;}
 .sow-hint.hide{opacity:0!important;animation:none;}
+
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;width:100%;}
+.goal-chip{background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'Noto Serif SC',serif;font-size:11px;padding:6px 4px;text-align:center;
+  cursor:pointer;display:flex;flex-direction:column;gap:2px;align-items:center;transition:background .1s;}
+.goal-chip:hover{background:var(--btn-h);}
+.goal-chip.gc-active{background:var(--btn-h);border-color:var(--accent);color:var(--light);}
+.goal-chip .gzh{font-size:11px;}
+.goal-chip .gen{font-size:9px;color:var(--dim);letter-spacing:1px;}
+.goal-chip.gc-active .gen{color:var(--accent);}
+
+/* ── SWIPE ── */
+html,body{height:100%;overflow:hidden;}
+#pageWrap{position:fixed;inset:0;display:flex;transition:transform .38s cubic-bezier(.4,0,.2,1);}
+#pageWrap.garden-view{transform:translateX(-100%);}
+.page{flex:0 0 100vw;height:100vh;overflow-y:auto;overflow-x:hidden;
+  display:flex;flex-direction:column;align-items:center;padding:20px 12px 48px;}
+.swipe-hint{position:fixed;right:8px;top:50%;transform:translateY(-50%);
+  opacity:0.3;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.swipe-hint span{font-size:9px;color:var(--dim);letter-spacing:1px;writing-mode:vertical-rl;}
+.swipe-arrow{width:8px;height:8px;border-right:1.5px solid var(--dim);border-bottom:1.5px solid var(--dim);transform:rotate(-45deg);}
+/* ── GARDEN PAGE ── */
+#pageGarden{background:var(--bg);}
+.g-hdr{width:100%;max-width:340px;display:flex;align-items:baseline;justify-content:space-between;
+  padding-bottom:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.g-hdr-title{color:var(--light);font-size:16px;letter-spacing:3px;font-weight:500;}
+.g-back{color:var(--dim);font-size:11px;cursor:pointer;letter-spacing:1px;}
+.g-back:hover{color:var(--light);}
+.g-canvas-wrap{width:100%;max-width:340px;background:var(--panel);border:1px solid var(--border);
+  position:relative;overflow:hidden;flex-shrink:0;}
+#gardenCanvas{display:block;width:100%;}
+#gardenRenameInput{position:absolute;display:none;background:var(--panel);border:1px solid var(--accent);
+  color:var(--light);font-family:'Noto Serif SC',serif;font-size:11px;padding:3px 6px;
+  outline:none;text-align:center;transform:translateX(-50%);z-index:10;}
+.g-empty{width:100%;max-width:340px;padding:48px 0;text-align:center;
+  color:var(--dim);font-size:12px;letter-spacing:2px;line-height:2.8;}
+/* ── GPO OVERLAY ── */
+#gpoOverlay{position:fixed;inset:0;z-index:200;background:var(--bg);
+  display:none;flex-direction:column;align-items:center;padding:20px 12px 32px;gap:10px;
+  opacity:0;transition:opacity .3s ease;}
+.gpo-hdr{width:100%;max-width:320px;display:flex;align-items:baseline;
+  justify-content:space-between;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.gpo-title-t{color:var(--light);font-size:14px;letter-spacing:2px;}
+.gpo-canvas-area{width:100%;max-width:320px;position:relative;cursor:none;}
+#gpoCanvas{display:block;width:100%;border:1px solid var(--border);}
+#gpoCvs{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+#gpoHint{text-align:center;color:var(--dim);font-size:11px;letter-spacing:2px;margin-top:6px;
+  animation:hintPulse 1.8s ease-in-out infinite;}
 </style>
 </head>
 <body>
@@ -127,9 +175,23 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
       <div class="ob-irow">
         <input id="obSidInput" type="text" inputmode="numeric" maxlength="11"
           placeholder="11 位学号" autocomplete="off">
-        <button class="btn" style="padding:10px 16px;flex-shrink:0;" onclick="ob1Submit()">→</button>
+        <button class="btn" style="padding:10px 12px;" onclick="ob1Submit()">→</button>
       </div>
       <div id="obErr" class="ob-err">&nbsp;</div>
+    </div>
+  </div>
+
+
+  <!-- Step ob_goal: 选择习惯 -->
+  <div id="ob_goal" class="ob-step">
+    <div class="ob-hdr">
+      <span class="ob-title">植物志</span>
+      <span class="ob-subv">选择习惯</span>
+    </div>
+    <div class="ob-card">
+      <div class="ob-desc">为这棵植物选择<br>一个想培养的习惯</div>
+      <div class="goal-grid" id="obGoalGrid"></div>
+      <button class="btn primary" id="goalNextBtn" onclick="obGoalNext()" disabled>确认</button>
     </div>
   </div>
 
@@ -160,9 +222,41 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
 
 </div>
 
-<!-- MAIN APP -->
+<!-- FRUIT MODAL -->
+<div id="fruitModal" style="display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(60,50,40,0.45);align-items:center;justify-content:center;padding:16px;">
+  <div style="width:100%;max-width:300px;background:var(--panel);border:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 20px;">
+    <div id="fruitModalTitle" style="color:var(--light);font-size:14px;letter-spacing:2px;"></div>
+    <div style="color:var(--dim);font-size:11px;line-height:2;text-align:center;">
+      习惯已养成<br>将这代种入花园</div>
+    <div style="display:flex;gap:8px;width:100%;">
+      <button class="btn" style="flex:1;" onclick="closeFruitModal()">稍后</button>
+      <button class="btn primary" style="flex:1;font-size:12px;" onclick="openGPO()">放入花园</button>
+    </div>
+  </div>
+</div>
+
+<!-- GPO OVERLAY -->
+<div id="gpoOverlay">
+  <div class="gpo-hdr">
+    <span class="gpo-title-t" id="gpoTitle">放入花园</span>
+    <span style="color:var(--dim);font-size:10px;letter-spacing:2px;">选择位置</span>
+  </div>
+  <div class="gpo-canvas-area" id="gpoArea">
+    <canvas id="gpoCanvas" width="320" height="480"></canvas>
+    <canvas id="gpoCvs" width="320" height="480"></canvas>
+  </div>
+  <div id="gpoHint">点击以种入</div>
+</div>
+
+<!-- PAGE WRAP -->
+<div id="pageWrap">
+
+<!-- PLANT PAGE -->
+<div class="page" id="pagePlant">
 <div class="wrap" id="app" style="display:none;">
-  <div class="hdr"><span class="title">植物志</span><span class="sub">PLANT CODEX</span></div>
+  <div class="hdr"><span class="title">植物志</span><span class="sub" style="cursor:pointer;text-underline-offset:3px;text-decoration:underline;" onclick="swipeTo('garden')">花园</span></div>
   <div id="sidHint" class="sid-hint" style="display:none">&nbsp;</div>
   <div class="garden">
     <canvas id="plantCanvas" width="240" height="240"></canvas>
@@ -181,12 +275,34 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Serif SC',serif;fo
   <div class="test-bar" style="flex-wrap:wrap;gap:6px;">
     <span class="test-lbl">TEST</span>
     <button class="btn test" onclick="nextDay()">+1 天</button>
+    <button class="btn test" onclick="changeGoal()">换习惯</button>
     <button class="btn danger" id="resetBtn" onclick="handleReset()">重置</button>
     <input id="sidInput" type="text" inputmode="numeric" maxlength="11" placeholder="更换学号" autocomplete="off"
       style="flex:1;min-width:80px;background:var(--panel);border:1px solid var(--border);color:var(--light);font-family:'Noto Serif SC',serif;font-size:11px;padding:5px 8px;outline:none;">
     <button class="btn test" onclick="setSID()">确认</button>
   </div>
 </div>
+<!-- swipe hint -->
+<div class="swipe-hint"><div class="swipe-arrow"></div><span>花园</span></div>
+</div><!-- /pagePlant -->
+
+<!-- GARDEN PAGE -->
+<div class="page" id="pageGarden">
+  <div class="g-hdr">
+    <span class="g-hdr-title">花园</span>
+    <button id="gardenModeBtn" onclick="cycleGardenMode()" style="background:var(--btn);border:1px solid var(--border);color:var(--text);font-family:'Noto Serif SC',serif;font-size:10px;padding:4px 8px;cursor:pointer;letter-spacing:1px;">花</button>
+    <span class="g-back" onclick="swipeTo('plant')">← 返回</span>
+  </div>
+  <div class="g-canvas-wrap" id="gardenWrap">
+    <canvas id="gardenCanvas" width="340" height="510"></canvas>
+    <input id="gardenRenameInput" type="text" maxlength="20">
+  </div>
+  <div class="g-empty" id="gardenEmpty" style="display:none">
+    还没有植物<br>种满一代结果<br>可放入此处
+  </div>
+</div><!-- /pageGarden -->
+
+</div><!-- /pageWrap -->
 <script>
 /* ── PALETTES / RNG ── */
 const STAGE_NAMES=['休眠','破土','嫩芽','初枝','繁茂','葱茏','参天','古木','永恒'];
@@ -212,7 +328,7 @@ function getGenome(sid){const p=parseID(sid);if(!p)return null;
   const rng=seededRng(hash32(sid));const pal=PALETTES[p.palIdx];
   return{col1:pal.a,col2:pal.b,col3:pal.c,stem:MAJOR_COLS[p.majIdx],acc:ACCENT_COLS[p.accIdx],
     foliageShape:Math.floor(rng()*3),stemShape:Math.floor(rng()*3),
-    spread:0.35+rng()*0.45,lean:(rng()-0.5)*0.25,lineWeight:0.7+rng()*1.1};}
+    spread:0.35+rng()*0.45,lean:(rng()-0.5)*0.25,lineWeight:1};}
 
 /* ── STORAGE / GROWTH ── */
 const K={sid:'pp_sid',ci:'pp_ci',off:'pp_off',fd:'pp_fd',fallen:'pp_fallen'};
@@ -276,6 +392,7 @@ function dryCol(hex){
 }
 
 // v2 foliage — unchanged
+let _tipPos=null; // set during drawPlant to collect foliage positions
 function drawFoliage(cx,cy,size,g,health,rng){
   const n=1+(rng()>0.6?1:0);
   const cols=[g.col1,g.col2,g.col3];
@@ -294,15 +411,48 @@ function drawFoliage(cx,cy,size,g,health,rng){
     }
   }
   if(health>=0.72&&rng()>0.55){stk(g.acc,g.lineWeight*0.7,()=>{CX.beginPath();CX.arc(cx+(rng()-0.5)*size*0.3,cy-size*0.22,size*0.10+1.5,0,Math.PI*2);CX.stroke();});}
+  if(_tipPos)_tipPos.push({x:cx,y:cy,size});
 }
 
-function drawPlant(sid,stage,health,fallenCount=0){
+
+function drawHabitLetters(sid,goal,tipPos,nodeR,accentCol,fruitDays){
+  if(fruitDays<0)return; // not yet at fruit stage
+  const word=goal.en.toUpperCase();
+  const letters=[...word];
+  // reveal all letters over 2.5 days
+  const fd=Math.max(0,fruitDays-1);
+  const revealed=Math.min(letters.length,Math.ceil(fd*letters.length/2.5));
+  if(revealed===0)return;
+  const fs=Math.round(nodeR*0.5);
+  const lrng=seededRng(hash32(sid+goal.en));
+  const shuffled=[...tipPos].sort(()=>lrng()-0.5);
+  const step=Math.max(1,Math.floor(shuffled.length/letters.length));
+  const slots=[];const r0=fs*0.6;
+  for(let i=0;i<letters.length;i++){
+    for(let a=0;a<10;a++){
+      const pos=shuffled[Math.min((i*step+a)%shuffled.length,shuffled.length-1)];
+      if(!pos)continue;
+      const ox=(lrng()-0.5)*pos.size*1.5,oy=(lrng()-0.5)*pos.size*1.5;
+      const cx=pos.x+ox,cy=pos.y+oy;
+      if(slots.some(s=>Math.sqrt((s.cx-cx)**2+(s.cy-cy)**2)<r0*2+3))continue;
+      slots.push({cx,cy,rot:(lrng()-0.5)*1.5});break;}}
+  // sort: left-to-right with top-down tiebreak
+  slots.sort((a,b)=>(a.cx+a.cy*0.4)-(b.cx+b.cy*0.4));
+  slots.slice(0,revealed).forEach((sl,i)=>{
+    CX.save();CX.translate(sl.cx,sl.cy);CX.rotate(sl.rot);
+    CX.font=`600 ${fs}px Kailasa,sans-serif`;
+    CX.fillStyle=accentCol;CX.globalAlpha=0.92;
+    CX.textAlign='center';CX.textBaseline='middle';
+    CX.fillText(letters[i],0,0);CX.restore();});}
+
+function drawPlant(sid,stage,health,fallenCount=0,fruitDays=-1){
+  _tipPos=[];
   CX.clearRect(0,0,240,240);
   CX.fillStyle='#f5f0e8';CX.fillRect(0,0,240,240);
   CX.strokeStyle='rgba(180,165,145,0.08)';
   for(let y=0;y<240;y+=6){CX.beginPath();CX.moveTo(0,y);CX.lineTo(240,y);CX.stroke();}
 
-  const g=getGenome(sid);if(!g)return;
+  const g=getGenomeForGen(sid,getCurrentGen());if(!g)return;
   const wither=Math.max(0,1-health);
   const gw={...g,
     col1:witherCol(g.col1,health),col2:witherCol(g.col2,health),
@@ -424,6 +574,11 @@ function drawPlant(sid,stage,health,fallenCount=0){
     // crown — only if trunk reaches near full height
     if(showFoliage&&breakFrac>0.85)drawFoliage(GX+leanX,tipY,nodeR*1.25,gw,health,rng);
   });
+  // draw habit letters over foliage
+  if(_tipPos&&_tipPos.length>0){
+    const goal=getGoal();
+    if(goal){drawHabitLetters(sid,goal,_tipPos,nodeR,g.acc,fruitDays);}}
+  _tipPos=null;
 }
 
 /* ── EXPORT ── */
@@ -487,7 +642,15 @@ function refresh(){
     const hint=document.getElementById('sidHint');
     hint.textContent=parsed.year+' 届  ·  专业 '+parsed.major;
     hint.className='sid-hint ok';
-    drawPlant(sid,stage,health,getFallen());
+    // track fruit date (first day stage 8 reached)
+    if(stage===8&&!localStorage.getItem('pp_fruit_date')){
+      localStorage.setItem('pp_fruit_date',today);}
+    const fruitDate=localStorage.getItem('pp_fruit_date');
+    const fruitDays=fruitDate?Math.max(0,Math.round((new Date(today)-new Date(fruitDate))/86400000)):-1;
+    drawPlant(sid,stage,health,getFallen(),fruitDays);
+    const goal2=getGoal();
+    const allRevealed=goal2&&stage===8&&fruitDays>=1&&Math.ceil(Math.max(0,fruitDays-1)*goal2.en.length/2.5)>=goal2.en.length;
+    document.getElementById('plantCanvas').style.cursor=allRevealed?'pointer':'default';
     const done=cis.includes(today);
     const btn=document.getElementById('checkinBtn');
     btn.disabled=done;btn.textContent=done?'今日已打卡':'今日打卡';
@@ -525,8 +688,8 @@ function handleReset(){
   }else{
     clearTimeout(_rTimer);_rPhase=0;btn.textContent='重置';btn.style.color='';
     Object.values(K).forEach(k=>localStorage.removeItem(k));
-    ['pp_fallen_date','pp_maxstage','pp_onboarded'].forEach(k=>localStorage.removeItem(k));
-    obSID='';obGenome=null;
+    ['pp_fallen_date','pp_maxstage','pp_onboarded','pp_goal','pp_fruit_date','pp_gen','pp_garden'].forEach(k=>localStorage.removeItem(k));
+    obSID='';obGenome=null;activeGoal=null;
     document.getElementById('app').style.display='none';
     document.getElementById('obSidInput').value='';
     document.getElementById('obErr').innerHTML='&nbsp;';
@@ -565,6 +728,91 @@ function showObStep(id){
 }
 
 // Step 1
+
+
+/* ── GENERATIONAL GENOME DRIFT ── */
+function blendHex(a,b,t){
+  const ar=parseInt(a.slice(1,3),16),ag=parseInt(a.slice(3,5),16),ab=parseInt(a.slice(5,7),16);
+  const br=parseInt(b.slice(1,3),16),bg=parseInt(b.slice(3,5),16),bb=parseInt(b.slice(5,7),16);
+  return '#'+[ar+(br-ar)*t,ag+(bg-ag)*t,ab+(bb-ab)*t].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');}
+
+function getGenomeForGen(sid,gen){
+  const p=parseID(sid);if(!p)return getGenome(sid);
+  const g1=getGenome(sid);
+  if(gen<=1)return{...g1,gen:1};
+  const blendAmt=Math.min(0.40,(gen-1)*0.12);
+  const driftPalIdx=(p.palIdx+Math.floor((gen-1)/2)+1)%PALETTES.length;
+  const driftPal=PALETTES[driftPalIdx];
+  const valShift=gen%2===0?0.08:-0.05;
+  function driftCol(base,target){
+    let cx=blendHex(base,target,blendAmt);
+    const r=parseInt(cx.slice(1,3),16),g=parseInt(cx.slice(3,5),16),b=parseInt(cx.slice(5,7),16);
+    const sh=Math.round(valShift*60);
+    return '#'+[r+sh,g+sh,b+sh].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');}
+  let fShape=g1.foliageShape;
+  for(let g=2;g<=gen;g++){if(seededRng(hash32(sid+'_fs'+g))()>0.65)fShape=(fShape+1)%3;}
+  let sShape=g1.stemShape;
+  for(let g=2;g<=gen;g++){if(seededRng(hash32(sid+'_ss'+g))()>0.80)sShape=(sShape+1)%3;}
+  let spread=g1.spread;
+  for(let g=2;g<=gen;g++){const r=seededRng(hash32(sid+'_sp'+g));spread=Math.max(0.22,Math.min(0.85,spread+(r()-0.5)*0.16));}
+  let lean=g1.lean,leanCap=0.25+Math.min(0.15,(gen-1)*0.04);
+  for(let g=2;g<=gen;g++){const r=seededRng(hash32(sid+'_ln'+g));
+    if(r()<0.25)lean=-lean;else lean=Math.max(-leanCap,Math.min(leanCap,lean+(r()-0.5)*0.07));}
+  return{col1:driftCol(g1.col1,driftPal.a),col2:driftCol(g1.col2,driftPal.b),
+    col3:driftCol(g1.col3,driftPal.c),stem:g1.stem,acc:g1.acc,
+    foliageShape:fShape,stemShape:sShape,spread,lean,lineWeight:1,gen};}
+
+function getCurrentGen(){return parseInt(localStorage.getItem('pp_gen')||'1');}
+function getGarden(){try{return JSON.parse(localStorage.getItem('pp_garden')||'[]');}catch{return[];}}
+/* ── HABIT GOALS ── */
+const GOALS=[
+  {zh:'喝水',en:'water'},{zh:'健身',en:'fitness'},{zh:'跑步',en:'run'},
+  {zh:'阅读',en:'read'},{zh:'学习',en:'study'},{zh:'早睡',en:'sleep'},
+  {zh:'冥想',en:'meditate'},{zh:'写日记',en:'journal'},{zh:'拉伸',en:'stretch'},
+  {zh:'散步',en:'walk'},{zh:'编程',en:'code'},{zh:'绘画',en:'draw'},
+  {zh:'练乐器',en:'practice'},{zh:'整理',en:'tidy'},{zh:'刷牙',en:'brush'},
+];
+let activeGoal=null;
+
+function getGoal(){
+  try{return JSON.parse(localStorage.getItem('pp_goal')||'null');}catch{return null;}}
+
+function buildGoalGrid(){
+  const grid=document.getElementById('obGoalGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  const btn=document.getElementById('goalNextBtn');
+  if(btn)btn.disabled=!activeGoal;
+  GOALS.forEach(g=>{
+    const chip=document.createElement('div');
+    chip.className='goal-chip'+(g.en===activeGoal?.en?' gc-active':'');
+    chip.innerHTML=`<span class="gzh">${g.zh}</span><span class="gen">${g.en}</span>`;
+    chip.onclick=()=>{activeGoal=g;buildGoalGrid();
+      document.getElementById('goalNextBtn').disabled=false;};
+    grid.appendChild(chip);});}
+
+function changeGoal(){
+  activeGoal=null; // force reselect
+  obSID=localStorage.getItem(K.sid)||'';
+  obGenome=getGenome(obSID);
+  buildGoalGrid();
+  const ob=document.getElementById('onboarding');
+  ob.classList.remove('out');ob.style.display='flex';ob.style.opacity='1';
+  showObStep('ob_goal');}
+
+function obGoalNext(){
+  if(!activeGoal)return;
+  localStorage.setItem('pp_goal',JSON.stringify(activeGoal));
+  // ensure obSID/obGenome set (may be null on returning sessions)
+  if(!obSID)obSID=localStorage.getItem(K.sid)||'';
+  if(!obGenome&&obSID)obGenome=getGenome(obSID);
+  if(obGenome){
+    const p=parseID(obSID);
+    if(p){document.getElementById('seedYear').textContent=p.year+' 届 · '+p.major;
+          document.getElementById('seedCode').textContent='SEED  #'+p.num;}
+    drawSeedPreview(obGenome);}
+  showObStep('ob2');}
+
 function ob1Submit(){
   const val=document.getElementById('obSidInput').value.trim();
   if(!/^\d{11}$/.test(val)){
@@ -578,7 +826,8 @@ function ob1Submit(){
   document.getElementById('seedYear').textContent=p.year+' 届 · 专业 '+p.major;
   document.getElementById('seedCode').textContent='SEED  #'+p.num;
   drawSeedPreview(obGenome);
-  showObStep('ob2');
+  buildGoalGrid();
+  showObStep('ob_goal');
 }
 document.getElementById('obSidInput').addEventListener('keydown',e=>{if(e.key==='Enter')ob1Submit();});
 
@@ -596,40 +845,33 @@ function drawShape(ctx,cx,cy,R,g,strokeW){
   const glyph=glyphs[seedShape(g)];
   const fs=Math.round(R*2.1);
   ctx.font=`${fs}px serif`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillStyle=g.col1;
-  ctx.globalAlpha=0.9;
-  ctx.fillText(glyph,cx,cy);
-  ctx.globalAlpha=1;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle=g.col1;ctx.globalAlpha=0.9;
+  ctx.fillText(glyph,cx,cy);ctx.globalAlpha=1;
 }
 
-// Seed preview (step 2) — simple shape
+// Seed preview (step 2) — just the glyph, no stem
 function drawSeedPreview(g){
   const cvs=document.getElementById('seedCvs'),ctx=cvs.getContext('2d');
-  const W=120,H=140,cx=60,cy=70;
-  ctx.clearRect(0,0,W,H);
-  drawShape(ctx,cx,cy,26,g,1.6);
+  ctx.clearRect(0,0,120,140);
+  ctx.fillStyle='#f5f0e8';ctx.fillRect(0,0,120,140);
+  drawShape(ctx,60,70,28,g,0);
 }
 
-// Ground line (step 3) — thin line + tick marks, no pixel fill
+// Ground line (step 3)
 function drawGroundLine(ctx){
   ctx.strokeStyle='#c8bfb4';ctx.lineWidth=1;ctx.lineCap='round';
   ctx.beginPath();ctx.moveTo(20,SOIL_TOP);ctx.lineTo(SOW_W-20,SOIL_TOP);ctx.stroke();
-  // irregular ticks below
   ctx.lineWidth=0.7;ctx.globalAlpha=0.45;
   for(let x=32;x<SOW_W-32;x+=14+(x%19)){
     const h=3+((x*7)%5);
-    ctx.beginPath();ctx.moveTo(x,SOIL_TOP);ctx.lineTo(x+(x%5-2)*0.5,SOIL_TOP+h);ctx.stroke();
-  }
-  ctx.globalAlpha=1;
-}
+    ctx.beginPath();ctx.moveTo(x,SOIL_TOP);ctx.lineTo(x+(x%5-2)*0.5,SOIL_TOP+h);ctx.stroke();}
+  ctx.globalAlpha=1;}
 
-// Simple shape seed for sow canvas
+// Sow canvas seed — glyph at readable size
 function drawSeedAt(ctx,cx,cy){
   if(!obGenome)return;
-  drawShape(ctx,cx,cy,9,obGenome,1.2);
-}
+  drawShape(ctx,cx,cy,14,obGenome,0);}
 
 function spawnParts(cx,cy){
   sowParts=[];
@@ -638,7 +880,7 @@ function spawnParts(cx,cy){
     const a=Math.random()*Math.PI*2,spd=0.8+Math.random()*3;
     sowParts.push({x:cx,y:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd-2,
       life:18+Math.floor(Math.random()*14),
-      col:[obGenome.col1,obGenome.col2,'#c8bfb4'][i%3],
+      col:[(obGenome?.col1||'#7060a8'),(obGenome?.col2||'#a890d0'),'#c8bfb4'][i%3],
       len:4+Math.random()*6});
   }
   // expanding arc rings
@@ -664,7 +906,7 @@ function initSowCanvas(){
       // draw rings
       sowRings.forEach(ring=>{
         ring.r+=2.2;ring.alpha*=0.88;
-        ctx.strokeStyle=obGenome.col1;ctx.lineWidth=1;ctx.globalAlpha=ring.alpha;
+        ctx.strokeStyle=obGenome?.col1||'#7060a8';ctx.lineWidth=1;ctx.globalAlpha=ring.alpha;
         ctx.beginPath();ctx.arc(SOW_W/2,SOIL_TOP,ring.r,Math.PI,Math.PI*2);ctx.stroke();
         ctx.globalAlpha=1;
       });
@@ -703,12 +945,346 @@ function sowComplete(){
 }
 
 // Init
+
+
+/* ── SWIPE ── */
+let currentPage='plant';
+function swipeTo(page){
+  currentPage=page;
+  document.getElementById('pageWrap').classList.toggle('garden-view',page==='garden');
+  if(page==='garden')renderGarden();}
+let tsX=0,tsY=0;
+document.getElementById('pageWrap').addEventListener('touchstart',e=>{tsX=e.touches[0].clientX;tsY=e.touches[0].clientY;},{passive:true});
+document.getElementById('pageWrap').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tsX,dy=e.changedTouches[0].clientY-tsY;
+  if(Math.abs(dx)>Math.abs(dy)*1.5&&Math.abs(dx)>40){
+    if(dx<0&&currentPage==='plant')swipeTo('garden');
+    else if(dx>0&&currentPage==='garden')swipeTo('plant');}},{passive:true});
+let mdX=0,mdDown=false;
+document.getElementById('pageWrap').addEventListener('mousedown',e=>{mdX=e.clientX;mdDown=true;});
+document.getElementById('pageWrap').addEventListener('mouseup',e=>{
+  if(!mdDown)return;mdDown=false;const dx=e.clientX-mdX;
+  if(Math.abs(dx)>60){if(dx<0&&currentPage==='plant')swipeTo('garden');
+    else if(dx>0&&currentPage==='garden')swipeTo('plant');}});
+
+/* ── GARDEN RENDER ── */
+let gardenHitAreas=[];
+let gardenMode='flower'; // 'plain' | 'flower' | 'letter'
+const GARDEN_MODES=[
+  {key:'plain', label:'无'},
+  {key:'flower',label:'花'},
+  {key:'letter',label:'字'},
+];
+function cycleGardenMode(){
+  const idx=GARDEN_MODES.findIndex(m=>m.key===gardenMode);
+  gardenMode=GARDEN_MODES[(idx+1)%GARDEN_MODES.length].key;
+  document.getElementById('gardenModeBtn').textContent=GARDEN_MODES.find(m=>m.key===gardenMode).label;
+  renderGarden();}
+function drawPlantTo(ctx,sz,genome,stage,health){
+  const sc=sz/240,PAD=Math.round(10*sc);
+  const gw={...genome,
+    col1:witherCol(genome.col1,health),col2:witherCol(genome.col2,health),
+    col3:witherCol(genome.col3,health),stem:witherCol(genome.stem,health)};
+  const rng=seededRng(hash32(String(genome.col1+genome.foliageShape+genome.stemShape))^0x9e3779b9);
+  const GX=sz/2+(rng()-0.5)*10*sc,GY=sz-18*sc;
+  const _tips2=[];
+  const _dptMode=arguments[6]||'flower';
+  function sk2(col,w,fn){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';fn();ctx.restore();}
+  function bc2(x0,y0,x1,y1,crv,cv=1){
+    const mx=(x0+x1)/2,my=(y0+y1)/2,l=Math.sqrt((x1-x0)**2+(y1-y0)**2)||1;
+    const px=(-(y1-y0)/l*crv+(rng()-0.5)*4*sc)*cv,py=((x1-x0)/l*crv+(rng()-0.5)*4*sc)*cv;
+    ctx.beginPath();ctx.moveTo(x0,y0);ctx.bezierCurveTo(x0+(mx-x0)*0.5+px,y0+(my-y0)*0.5+py,x1-(x1-mx)*0.5+px,y1-(y1-my)*0.5+py,x1,y1);ctx.stroke();}
+  function fol2(cx,cy,size){
+    const n=1+(rng()>0.6?1:0),cols=[gw.col1,gw.col2,gw.col3];
+    for(let i=0;i<n;i++){
+      const col=cols[i%3],w=gw.lineWeight*sc*(0.7+i*0.1),ox=(rng()-0.5)*size*0.5,oy=(rng()-0.5)*size*0.4;
+      if(gw.foliageShape===0){sk2(col,w,()=>{ctx.beginPath();ctx.ellipse(cx+ox,cy+oy,size*(0.25+rng()*0.3),size*(0.18+rng()*0.22),(rng()-0.5),0,Math.PI*2);ctx.stroke();});}
+      else if(gw.foliageShape===1){const rw=size*(0.3+rng()*0.32),rh=size*(0.2+rng()*0.24),rot=(rng()-0.5)*1.1;sk2(col,w,()=>{ctx.save();ctx.translate(cx+ox,cy+oy);ctx.rotate(rot);ctx.strokeRect(-rw/2,-rh/2,rw,rh);ctx.restore();});}
+      else{const nL=3+Math.floor(rng()*3),bA=-Math.PI/2+(rng()-0.5)*0.6,fW=0.5+rng()*0.7;sk2(col,w,()=>{for(let j=0;j<nL;j++){const a=bA-fW/2+(j/Math.max(nL-1,1))*fW,len=size*(0.35+rng()*0.4);ctx.beginPath();ctx.moveTo(cx+ox,cy+oy);ctx.lineTo(cx+ox+Math.cos(a)*len,cy+oy+Math.sin(a)*len);ctx.stroke();}});}
+    }
+    // flower circles (acc color) — only in 'flower' mode
+    if(_dptMode==='flower'&&health>=0.72&&rng()>0.55){sk2(gw.acc,gw.lineWeight*sc*0.7,()=>{ctx.beginPath();ctx.arc(cx+(rng()-0.5)*size*0.3,cy-size*0.22,size*0.10+1.5*sc,0,Math.PI*2);ctx.stroke();});}
+    _tips2.push({x:cx,y:cy,size});
+  }
+  ctx.save();ctx.beginPath();ctx.rect(PAD,PAD,sz-PAD*2,sz-PAD*2);ctx.clip();
+  if(stage===0){sk2(gw.stem,gw.lineWeight*sc*0.9,()=>{const s=12*sc;ctx.beginPath();ctx.moveTo(GX,GY-s);ctx.lineTo(GX+s*0.7,GY-s*0.3);ctx.lineTo(GX,GY+s*0.15);ctx.lineTo(GX-s*0.7,GY-s*0.3);ctx.closePath();ctx.stroke();});ctx.restore();return;}
+  const TH=[0,20,38,56,74,90,106,124,140];
+  const BF=[[],[],[0.55],[0.42,0.75],[0.32,0.56,0.78],[0.25,0.44,0.62,0.80],[0.20,0.38,0.54,0.68,0.82],[0.16,0.30,0.44,0.57,0.69,0.81],[0.13,0.25,0.37,0.49,0.60,0.70,0.80,0.90]];
+  const tH=TH[stage]*sc,fracs=BF[stage],leanX=gw.lean*tH*0.55,nodeR=(13+stage*3.2)*sc;
+  const cv2=Math.min(1,Math.max(0,(health-0.5)*2)),bf=health>0.5?1:Math.max(0.25,health*2);
+  const brkY=GY-tH*bf,brkX=GX+leanX*bf,bsz=(7+stage*1.6)*sc;
+  sk2(gw.stem,gw.lineWeight*sc,()=>{
+    if(gw.stemShape===0){ctx.beginPath();ctx.moveTo(GX-bsz,GY);ctx.lineTo(GX+bsz,GY);ctx.lineTo(GX+leanX*0.2,GY-bsz*1.4);ctx.closePath();ctx.stroke();}
+    else if(gw.stemShape===1){ctx.strokeRect(GX-bsz*0.65,GY-bsz*0.6,bsz*1.3,bsz*0.6);}
+    else{ctx.beginPath();ctx.moveTo(GX-bsz,GY);ctx.lineTo(GX+bsz,GY-bsz*0.7);ctx.stroke();ctx.beginPath();ctx.moveTo(GX+bsz,GY);ctx.lineTo(GX-bsz,GY-bsz*0.7);ctx.stroke();}
+  });
+  sk2(gw.stem,gw.lineWeight*sc*1.4,()=>{bc2(GX,GY,brkX,brkY,leanX*0.3*bf,cv2);});
+  if(stage>=5)sk2(gw.col1,gw.lineWeight*sc*0.5,()=>{bc2(GX+2.5*sc,GY,brkX+2.5*sc,brkY,leanX*0.2*bf+3,cv2);});
+  fracs.forEach((frac,bi)=>{
+    if(frac>bf+0.05)return;
+    const by=GY-tH*frac,bx=GX+leanX*frac,ang=(gw.spread*0.5+frac*(0.55-gw.spread*0.5))*Math.PI,bLen=(22+nodeR*0.85)*(0.65+(1-frac)*0.5);
+    [[-1,1+(rng()-0.5)*0.22],[1,1+(rng()-0.5)*0.22]].forEach(([side,asym])=>{
+      const bLenS=bLen*asym,tx=bx+side*Math.cos(ang)*bLenS,ty=by-Math.sin(ang)*bLenS;
+      const col=bi%2===0?gw.col1:gw.col2,droop=(1-frac)*6*side;
+      sk2(col,gw.lineWeight*sc*0.95,()=>{bc2(bx,by,tx,ty,droop,cv2);});
+      if(health>0.5)fol2(tx,ty,nodeR);
+    });});
+  if(health>0.5&&bf>0.85)fol2(GX+leanX,GY-tH,nodeR*1.25);
+  ctx.restore();
+  // letters for stage-8 stickers (only in 'letter' mode)
+  if(stage===8&&_tips2.length>0&&_dptMode==='letter'){
+    const g2arg=arguments[5]; // goal passed as 6th arg
+    if(g2arg&&g2arg.en){
+      const word=g2arg.en.toUpperCase(),letters=[...word];
+      const fs=Math.round(nodeR*0.5);
+      const lrng3=seededRng(hash32(String(genome.col1)+g2arg.en));
+      const shuffled=[..._tips2].sort(()=>lrng3()-0.5);
+      const step=Math.max(1,Math.floor(shuffled.length/letters.length));
+      const slots=[],r0=fs*0.6;
+      for(let i=0;i<letters.length;i++){
+        for(let a=0;a<10;a++){
+          const pos=shuffled[Math.min((i*step+a)%shuffled.length,shuffled.length-1)];
+          if(!pos)continue;
+          const ox=(lrng3()-0.5)*pos.size*1.5,oy=(lrng3()-0.5)*pos.size*1.5;
+          const cx2=pos.x+ox,cy2=pos.y+oy;
+          if(slots.some(s=>Math.sqrt((s.cx-cx2)**2+(s.cy-cy2)**2)<r0*2+2))continue;
+          slots.push({cx:cx2,cy:cy2,rot:(lrng3()-0.5)*1.5});break;}}
+      slots.sort((a,b)=>(a.cx+a.cy*0.4)-(b.cx+b.cy*0.4));
+      slots.forEach((sl,i)=>{
+        ctx.save();ctx.translate(sl.cx,sl.cy);ctx.rotate(sl.rot);
+        ctx.font=`600 ${fs}px Kailasa,sans-serif`;
+        ctx.fillStyle=genome.acc;ctx.globalAlpha=0.92;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(letters[i],0,0);ctx.restore();});}}}
+
+function witherCol(hex,h){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  const t=Math.pow(Math.max(0,1-h)*1.1,1.5),wr=h<0.2?100:155,wg=h<0.2?90:118,wb=h<0.2?78:62;
+  return`rgb(${Math.round(r+(wr-r)*t)},${Math.round(g+(wg-g)*t)},${Math.round(b+(wb-b)*t)})`;}
+
+function renderGarden(){
+  const garden=getGarden();
+  const GC=document.getElementById('gardenCanvas'),GW=GC.width,GH=GC.height;
+  const ctx=GC.getContext('2d');
+  gardenHitAreas=[];
+  document.getElementById('gardenEmpty').style.display=garden.length===0?'block':'none';
+  document.getElementById('gardenWrap').style.display=garden.length===0?'none':'block';
+  if(garden.length===0)return;
+  const wrap=document.getElementById('gardenWrap');
+  GC.style.height=Math.round((wrap.clientWidth||340)*(GH/GW))+'px';
+  ctx.fillStyle='#f5f0e8';ctx.fillRect(0,0,GW,GH);
+  ctx.strokeStyle='rgba(180,165,145,0.055)';ctx.lineWidth=0.7;
+  for(let y=0;y<GH;y+=8){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
+  [...garden].map((r,i)=>({...r,_i:i})).sort((a,b)=>a.y-b.y).forEach(rec=>{
+    const px=Math.round(GH*0.28+(rec.stage/8)*GH*0.18);
+    const oc=document.createElement('canvas');oc.width=px;oc.height=px;
+    const og=getGenomeForGen(rec.sid,rec.gen);if(!og)return;
+    drawPlantTo(oc.getContext('2d'),px,og,rec.stage,rec.health,rec.goal,gardenMode);
+    const cx=Math.round(rec.x*GW),cy=Math.round(rec.y*GH);
+    ctx.save();ctx.translate(cx,cy);ctx.rotate((rec.rot||0)*Math.PI/180);
+    ctx.drawImage(oc,-px/2,-px*0.92);
+    ctx.font='9px "Noto Serif SC",serif';ctx.fillStyle='rgba(90,75,60,0.5)';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(rec.label||('GEN '+rec.gen),0,8);
+    ctx.restore();
+    gardenHitAreas.push({cx,cy,r:px/2,idx:rec._i});});}
+
+/* ── GARDEN RENAME ── */
 (function(){
+  const gc=document.getElementById('gardenCanvas');
+  const inp=document.getElementById('gardenRenameInput');
+  let lastTap=0,renameIdx=-1;
+  function tryRename(clientX,clientY){
+    const r=gc.getBoundingClientRect(),scX=gc.width/r.width,scY=gc.height/r.height;
+    const nx=(clientX-r.left)*scX,ny=(clientY-r.top)*scY;
+    for(const h of gardenHitAreas){
+      if(Math.sqrt((nx-h.cx)**2+(ny-h.cy)**2)<h.r+12){
+        renameIdx=h.idx;const rec=getGarden()[h.idx];if(!rec)return;
+        inp.value=rec.label||('GEN '+rec.gen);
+        inp.style.display='block';inp.style.left=(h.cx/scX+r.left-document.getElementById('gardenWrap').getBoundingClientRect().left)+'px';
+        inp.style.top=(h.cy/scY+h.r/scY+6)+'px';inp.style.width=Math.max(72,h.r/scX*2)+'px';
+        inp.focus();inp.select();return;}}}
+  function commit(){
+    if(renameIdx<0){inp.style.display='none';return;}
+    const garden=getGarden();const v=inp.value.trim();
+    if(v&&garden[renameIdx])garden[renameIdx].label=v;
+    localStorage.setItem('pp_garden',JSON.stringify(garden));
+    inp.style.display='none';renameIdx=-1;renderGarden();}
+  gc.addEventListener('dblclick',e=>tryRename(e.clientX,e.clientY));
+  gc.addEventListener('touchend',e=>{const now=Date.now();
+    if(now-lastTap<360){const t=e.changedTouches[0];tryRename(t.clientX,t.clientY);}lastTap=now;});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape'){inp.style.display='none';renameIdx=-1;}});
+  inp.addEventListener('blur',commit);
+})();
+
+/* ── GPO (garden placement overlay) ── */
+const GPO_W=320,GPO_H=480;
+let gpoRecord=null,gpoMX=160,gpoMY=240,gpoCurX=160,gpoCurY=240;
+let gpoPhase='idle',gpoSeedY=-10,gpoRaf=null,gpoParts=[],gpoRings=[];
+
+function openGPO(){
+  closeFruitModal();
+  const sid=localStorage.getItem(K.sid)||'';
+  const gen=getCurrentGen();const{stage,health}=calcGrowth(getCIs());
+  gpoRecord={sid,gen,stage,health:Math.round(health*100)/100,retiredAt:getToday()};
+  gpoCurX=GPO_W/2;gpoCurY=GPO_H/2;gpoPhase='placing';gpoParts=[];gpoRings=[];gpoSeedY=-10;
+  document.getElementById('gpoTitle').textContent='GEN '+gen+'  ·  放入花园';
+  document.getElementById('gpoHint').style.display='block';
+  gpoBg();
+  const ov=document.getElementById('gpoOverlay');ov.style.display='flex';
+  requestAnimationFrame(()=>ov.style.opacity='1');
+  const area=document.getElementById('gpoArea');
+  area.onmousemove=e=>{const r=area.getBoundingClientRect(),sc=GPO_W/r.width;gpoCurX=(e.clientX-r.left)*sc;gpoCurY=(e.clientY-r.top)*sc;};
+  area.onclick=e=>{if(gpoPhase!=='placing')return;const r=area.getBoundingClientRect(),sc=GPO_W/r.width;gpoMX=(e.clientX-r.left)*sc;gpoMY=(e.clientY-r.top)*sc;gpoPhase='falling';gpoSeedY=-10;document.getElementById('gpoHint').style.display='none';};
+  area.ontouchmove=e=>{e.preventDefault();const r=area.getBoundingClientRect(),sc=GPO_W/r.width;gpoCurX=(e.touches[0].clientX-r.left)*sc;gpoCurY=(e.touches[0].clientY-r.top)*sc;};
+  area.ontouchend=e=>{if(gpoPhase!=='placing')return;e.preventDefault();const r=area.getBoundingClientRect(),sc=GPO_W/r.width,t=e.changedTouches[0];gpoMX=(t.clientX-r.left)*sc;gpoMY=(t.clientY-r.top)*sc;gpoPhase='falling';gpoSeedY=-10;document.getElementById('gpoHint').style.display='none';};
+  if(gpoRaf)cancelAnimationFrame(gpoRaf);gpoLoop();}
+
+function gpoBg(){
+  const ctx=document.getElementById('gpoCanvas').getContext('2d');
+  ctx.fillStyle='#f5f0e8';ctx.fillRect(0,0,GPO_W,GPO_H);
+  ctx.strokeStyle='rgba(180,165,145,0.055)';ctx.lineWidth=0.7;
+  for(let y=0;y<GPO_H;y+=8){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GPO_W,y);ctx.stroke();}
+  getGarden().forEach(rec=>{
+    const px=Math.round(GPO_H*0.22+(rec.stage/8)*GPO_H*0.16);
+    const oc=document.createElement('canvas');oc.width=px;oc.height=px;
+    const og=getGenomeForGen(rec.sid,rec.gen);if(!og)return;
+    drawPlantTo(oc.getContext('2d'),px,og,rec.stage,rec.health,rec.goal);
+    ctx.save();ctx.translate(rec.x*GPO_W,rec.y*GPO_H);ctx.rotate((rec.rot||0)*Math.PI/180);
+    ctx.drawImage(oc,-px/2,-px*0.92);
+    ctx.font='9px "Noto Serif SC",serif';ctx.fillStyle='rgba(90,75,60,0.45)';
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(rec.label||('GEN '+rec.gen),0,8);
+    ctx.restore();});}
+
+function gpoCH(ctx,x,y){
+  const G=7,R=22;
+  ctx.strokeStyle='rgba(106,122,90,0.09)';ctx.lineWidth=0.8;ctx.setLineDash([3,7]);
+  ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GPO_W,y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GPO_H);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle='rgba(106,122,90,0.8)';ctx.lineWidth=1.2;ctx.lineCap='round';
+  [[x-R,y,x-G,y],[x+G,y,x+R,y],[x,y-R,x,y-G],[x,y+G,x,y+R]].forEach(([x0,y0,x1,y1])=>{ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();});
+  ctx.strokeStyle='rgba(106,122,90,0.25)';ctx.lineWidth=0.8;
+  ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.stroke();
+  ctx.fillStyle='rgba(106,122,90,0.8)';ctx.beginPath();ctx.arc(x,y,1.8,0,Math.PI*2);ctx.fill();}
+
+function gpoGhostPlant(ctx,x,y,alpha){
+  if(!gpoRecord)return;
+  const px=Math.round(GPO_H*0.22+(gpoRecord.stage/8)*GPO_H*0.16);
+  const oc=document.createElement('canvas');oc.width=px;oc.height=px;
+  const og=getGenomeForGen(gpoRecord.sid,gpoRecord.gen);if(!og)return;
+  drawPlantTo(oc.getContext('2d'),px,og,gpoRecord.stage,gpoRecord.health);
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.drawImage(oc,-px/2,-px*0.92);ctx.restore();}
+
+function gpoDrawSeed(ctx,x,y){
+  if(!gpoRecord)return;
+  const og=getGenomeForGen(gpoRecord.sid,gpoRecord.gen);
+  const glyphs=['○','□','△','◇'];
+  const glyph=glyphs[(og.foliageShape*2+og.stemShape)%4];
+  ctx.font='18px serif';ctx.fillStyle=og.col1;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.globalAlpha=0.9;ctx.fillText(glyph,x,y);ctx.globalAlpha=1;}
+
+function gpoLoop(){
+  const cvs=document.getElementById('gpoCvs'),ctx=cvs.getContext('2d');
+  const og=gpoRecord?getGenomeForGen(gpoRecord.sid,gpoRecord.gen):null;
+  const c1=og?.col1||'#7060a8',c2=og?.col2||'#a890d0';
+  ctx.clearRect(0,0,GPO_W,GPO_H);
+  if(gpoPhase==='placing'){
+    gpoGhostPlant(ctx,gpoCurX,gpoCurY,0.32);
+    gpoCH(ctx,gpoCurX,gpoCurY);
+  }else if(gpoPhase==='falling'){
+    gpoSeedY+=13;
+    if(gpoSeedY>=gpoMY){
+      gpoSeedY=gpoMY;gpoPhase='impact';
+      gpoRings=[{r:1,max:36,a:0.75},{r:1,max:58,a:0.38}];gpoParts=[];
+      for(let i=0;i<18;i++){const a=Math.random()*Math.PI*2,sp=0.9+Math.random()*3.2;
+        gpoParts.push({x:gpoMX,y:gpoMY,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2.2,life:14+Math.floor(Math.random()*14),col:[c1,c2,'#c8bfb4'][i%3]});}
+    }else{gpoDrawSeed(ctx,gpoMX,gpoSeedY);}
+  }else if(gpoPhase==='impact'){
+    gpoRings.forEach(r=>{r.r+=2.6;r.a*=0.85;});gpoRings=gpoRings.filter(r=>r.r<r.max);
+    gpoRings.forEach(r=>{ctx.strokeStyle=c1;ctx.lineWidth=1;ctx.globalAlpha=r.a;ctx.beginPath();ctx.arc(gpoMX,gpoMY,r.r,Math.PI,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;});
+    let alive=false;
+    gpoParts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.26;p.life--;
+      if(p.life>0){alive=true;ctx.strokeStyle=p.col;ctx.lineWidth=1;ctx.lineCap='round';ctx.globalAlpha=p.life/24;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*3.5,p.y-p.vy*3.5);ctx.stroke();ctx.globalAlpha=1;}});
+    if(!alive&&!gpoRings.length){gpoPhase='done';gpoGrowAnim(gpoComplete);return;}
+  }
+  gpoRaf=requestAnimationFrame(gpoLoop);}
+
+function gpoGrowAnim(callback){
+  const cvs=document.getElementById('gpoCvs'),ctx=cvs.getContext('2d');
+  const og=getGenomeForGen(gpoRecord.sid,gpoRecord.gen);
+  const finalStage=gpoRecord.stage;
+  const px=Math.round(GPO_H*0.22+(finalStage/8)*GPO_H*0.16);
+  const rot=(Math.random()-0.5)*16;
+  let stage=0,frames=0;
+  function frame(){
+    ctx.clearRect(0,0,GPO_W,GPO_H);
+    const oc=document.createElement('canvas');oc.width=px;oc.height=px;
+    drawPlantTo(oc.getContext('2d'),px,og,Math.min(stage,finalStage),1.0);
+    ctx.save();ctx.translate(gpoMX,gpoMY);ctx.rotate(rot*Math.PI/180);
+    ctx.drawImage(oc,-px/2,-px*0.92);ctx.restore();
+    frames++;if(frames>=7){frames=0;stage++;if(stage>finalStage){setTimeout(callback,500);return;}}
+    requestAnimationFrame(frame);}
+  requestAnimationFrame(frame);}
+
+function gpoComplete(){
+  if(gpoRaf){cancelAnimationFrame(gpoRaf);gpoRaf=null;}
+  const garden=getGarden();
+  garden.push({...gpoRecord,x:gpoMX/GPO_W,y:gpoMY/GPO_H,rot:(Math.random()-0.5)*16,label:'GEN '+gpoRecord.gen,goal:getGoal()});
+  localStorage.setItem('pp_garden',JSON.stringify(garden));
+  localStorage.setItem('pp_gen',String(gpoRecord.gen+1));
+  localStorage.setItem(K.ci,'[]');
+  localStorage.removeItem(K.fd);
+  localStorage.setItem('pp_maxstage','0');
+  localStorage.setItem(K.fallen,'0');
+  localStorage.removeItem('pp_fallen_date');
+  localStorage.removeItem('pp_fruit_date');
+  localStorage.removeItem('pp_goal');
+  activeGoal=null;
+  const ov=document.getElementById('gpoOverlay');
+  ov.style.opacity='0';
+  setTimeout(()=>{
+    ov.style.display='none';ov.style.opacity='';
+    obSID=gpoRecord.sid;
+    obGenome=getGenome(obSID);
+    const ob=document.getElementById('onboarding');
+    ob.classList.remove('out');ob.style.display='flex';ob.style.opacity='1';
+    buildGoalGrid();
+    showObStep('ob_goal');},430);}
+
+/* ── FRUIT MODAL (letter click) ── */
+function closeFruitModal(){document.getElementById('fruitModal').style.display='none';}
+
+document.getElementById('plantCanvas').addEventListener('click',()=>{
+  const sid=localStorage.getItem(K.sid)||'';
+  if(!/^\d{11}$/.test(sid))return;
+  const{stage}=calcGrowth(getCIs());
+  if(stage<8)return;
+  const goal=getGoal();if(!goal)return;
+  const fruitDate=localStorage.getItem('pp_fruit_date');if(!fruitDate)return;
+  const fruitDays=Math.max(0,Math.round((new Date(getToday())-new Date(fruitDate))/86400000));
+  const fd=Math.max(0,fruitDays-1);
+  const revealed=Math.min(goal.en.length,Math.ceil(fd*goal.en.length/2.5));
+  if(revealed<goal.en.length)return;
+  const gen=getCurrentGen();
+  document.getElementById('fruitModalTitle').textContent='GEN '+gen+'  字母已集齐';
+  document.getElementById('fruitModal').style.display='flex';});
+
+(function(){
+  activeGoal=getGoal();
   const sid=localStorage.getItem(K.sid),done=localStorage.getItem('pp_onboarded');
   if(done&&sid&&/^\d{11}$/.test(sid)){
-    document.getElementById('onboarding').style.display='none';
-    document.getElementById('app').style.display='flex';
-    refresh();
+    if(!getGoal()){
+      // already onboarded but no habit yet — go straight to goal selection
+      obSID=sid;obGenome=getGenome(sid);
+      buildGoalGrid();
+      const obEl=document.getElementById('onboarding');
+      obEl.classList.remove('out');obEl.style.display='flex';obEl.style.opacity='1';
+      showObStep('ob_goal');
+    }else{
+      document.getElementById('onboarding').style.display='none';
+      document.getElementById('app').style.display='flex';
+      refresh();
+    }
   }else{
     showObStep('ob1');
   }
